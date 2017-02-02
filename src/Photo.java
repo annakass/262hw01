@@ -77,21 +77,17 @@ public class Photo {
 //
 //		contain.setVisible(true);
 //		
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //close when stop program
-//		
-		
+
 		
 //		JFrame frame = new JFrame();
 		Container contain = frame.getContentPane();
-		contain.setLayout(new FlowLayout());
+		
+		
 		contain.add(new JLabel(new ImageIcon(picture)));
 		frame.pack();
+
 		frame.setVisible(true);
-//		frame.getContentPane().setLayout(new FlowLayout());
-//		frame.getContentPane().add(new JLabel(new ImageIcon(picture)));
-//		frame.pack();
-//		frame.setVisible(true);
-		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //close when stop program
+
 		
 	}
 	
@@ -136,6 +132,7 @@ public class Photo {
 		int rawcolor = color.getRGB();
 		picture.setRGB(width, height, rawcolor);
 		
+		
 	}
 	
 	public void makeGreyscale () {
@@ -179,6 +176,30 @@ public class Photo {
 		
 	}
 	
+	public void makeBWGreyAt (int width, int height) {
+		if (getColorAAt(width, height).b < 127) {
+			Color c = Color.black;
+			ColorA ca = new ColorA(c);
+			changeColorAt(width, height, ca);
+		
+		}
+		else {
+			Color c = Color.white;
+			ColorA ca = new ColorA(c);
+			changeColorAt(width, height, ca);
+		}
+	
+		
+	}
+	
+	public void makeBWGrey () {
+		for (int ww = 0; ww < getWidth(); ww++) {
+			for (int hh = 0; hh < getHeight(); hh++) { 
+				makeBWGreyAt(ww, hh);
+			}
+		}
+	}
+	
 	public void replacePicture(Photo front, Photo back, Photo heat) { //photo out is the in
 		//if different sizes
 		ColorA bl = new ColorA(Color.black);
@@ -195,4 +216,93 @@ public class Photo {
 			}
 		}
 	}
+
+	
+	public void blur (){
+		BufferedImage temp = picture;
+		
+		ColorA methodaccess = new ColorA (Color.black);
+		
+		for (int ww = 2; ww < w-2; ww++) {
+			for (int hh = 2; hh < h-2; hh++) { 
+				Color avg = methodaccess.ave(getColorAt(ww-1, hh),getColorAt(ww, hh), getColorAt(ww+1, hh));
+				
+				int rawcolor = avg.getRGB();
+				temp.setRGB(ww, hh, rawcolor);
+				
+			}
+		}
+		picture = temp;
+	}
+	
+	public void blurlight (){
+		BufferedImage temp = picture;
+		
+		ColorA methodaccess = new ColorA (Color.black);
+		
+		for (int ww = 2; ww < w-2; ww++) {
+			for (int hh = 2; hh < h-2; hh++) { 
+				Color avg = (methodaccess.averageLight(getColorAt(ww-1, hh),getColorAt(ww, hh), getColorAt(ww+1, hh)));
+				
+				int rawcolor = avg.getRGB();
+				temp.setRGB(ww, hh, rawcolor);
+				
+			}
+		}
+		picture = temp;
+	}
+	
+	
+	public void blurheavy (){
+		BufferedImage temp = picture;
+		
+		ColorA methodaccess = new ColorA (Color.black);
+		
+		for (int ww = 2; ww < w-2; ww++) {
+			for (int hh = 2; hh < h-2; hh++) { 
+				Color avg = methodaccess.averageHeavy(getColorAt(ww-1, hh),getColorAt(ww, hh), getColorAt(ww+1, hh));
+				
+				int rawcolor = avg.getRGB();
+				temp.setRGB(ww, hh, rawcolor);
+				
+			}
+		}
+		picture = temp;
+	}
+	
+	public float[] getHSVat (int width, int height) {
+		Color color = getColorAt(width, height);
+		float[] hsv = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+		//System.out.print(hsv[0]);
+		return hsv;
+	
+	}
+	
+	public void makeBWHSV () {
+		for (int ww = 0; ww < getWidth(); ww++) {
+			for (int hh = 0; hh < getHeight(); hh++) { 
+				makeBWHSVat(ww, hh);
+			}
+		}
+	}
+	
+	public void makeBWHSVat(int width, int height) {
+		float[] hsv = getHSVat(width, height);
+		double green = (double) hsv[0];
+		if (green < 0.4 && green > 0.3  && hsv[2] > 0.5) {
+			Color c = Color.black;
+			ColorA ca = new ColorA(c);
+			changeColorAt(width, height, ca);
+		
+		}
+		else {
+			Color c = Color.white;
+			ColorA ca = new ColorA(c);
+			changeColorAt(width, height, ca);
+		}
+	
+		
+	}
 }
+
+
